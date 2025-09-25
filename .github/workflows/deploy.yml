@@ -1,0 +1,26 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch: {}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.3.110.154.91 }}
+          username: ${{ secrets.Ubuntu }}        # e.g. ubuntu
+          key: ${{ secrets.AIM.ppk }}         # private key contents
+          port: ${{ secrets.22 }}          # optional (default 22)
+          script: |
+            cd /home/ubuntu/myapp
+            git pull origin main
+            npm install
+            pm2 restart all || pm2 start npm -- start
